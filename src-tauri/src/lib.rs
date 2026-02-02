@@ -83,10 +83,30 @@ async fn get_stock_price(ticker: String) -> Result<f64, String> {
     }
 }
 
+#[command]
+async fn send_telegram_notification(token: String, chat_id: String, message: String) -> Result<(), String> {
+    let url = format!("https://api.telegram.org/bot{}/sendMessage", token);
+    let client = reqwest::Client::new();
+    
+    let payload = serde_json::json!({
+        "chat_id": chat_id,
+        "text": message,
+        "parse_mode": "HTML"
+    });
+
+    client.post(url)
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| format!("Failed to send Telegram message: {}", e))?;
+
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![get_stock_price])
+    .invoke_handler(tauri::generate_handler![get_stock_price, send_telegram_notification])
     .setup(|app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(

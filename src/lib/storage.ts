@@ -10,8 +10,24 @@ export interface StockAlert {
 }
 
 const STOCK_ALERTS_KEY = "pulse_stock_alerts";
+const SETTINGS_KEY = "pulse_settings";
+
+export interface Settings {
+    telegramToken: string;
+    telegramChatId: string;
+}
 
 export const storage = {
+    getSettings: (): Settings => {
+        if (typeof window === "undefined") return { telegramToken: "", telegramChatId: "" };
+        const stored = localStorage.getItem(SETTINGS_KEY);
+        return stored ? JSON.parse(stored) : { telegramToken: "", telegramChatId: "" };
+    },
+
+    saveSettings: (settings: Settings) => {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    },
+
     getAlerts: (): StockAlert[] => {
         if (typeof window === "undefined") return [];
         const stored = localStorage.getItem(STOCK_ALERTS_KEY);
@@ -41,6 +57,21 @@ export const storage = {
                     ...alert,
                     lastPrice: currentPrice,
                     status: triggered ? "triggered" : alert.status,
+                    updatedAt: new Date().toISOString(),
+                };
+            }
+            return alert;
+        });
+        localStorage.setItem(STOCK_ALERTS_KEY, JSON.stringify(alerts));
+    },
+
+    updateAlert: (id: string, ticker: string, targetPrice: number) => {
+        const alerts = storage.getAlerts().map((alert) => {
+            if (alert.id === id) {
+                return {
+                    ...alert,
+                    ticker: ticker.toUpperCase(),
+                    targetPrice,
                     updatedAt: new Date().toISOString(),
                 };
             }
