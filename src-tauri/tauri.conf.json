@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "multi-usage-app",
+  "productName": "Pulse",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.pulse.app",
   "build": {
     "frontendDist": "../out",
     "devUrl": "http://localhost:3000",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Multi-Usage App",
+        "title": "Pulse",
         "width": 800,
         "height": 600,
         "resizable": true,
